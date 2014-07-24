@@ -12,8 +12,3 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-
-void MainWindow::on_loadPushButton_clicked()
-{
-    m_api.loadData(ui->apiLineEdit->text());
-}

@@ -10,51 +10,82 @@
     <height>480</height>
    </rect>
   </property>
+  <property name="maximumSize">
+   <size>
+    <width>640</width>
+    <height>480</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Codeforces Qt Client</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QTableWidget" name="apiResultTableWidget">
+   <widget class="QTreeWidget" name="treeWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>50</y>
+      <y>40</y>
       <width>621</width>
-      <height>421</height>
+      <height>431</height>
      </rect>
     </property>
+    <property name="columnCount">
+     <number>1</number>
+    </property>
+    <attribute name="headerVisible">
+     <bool>false</bool>
+    </attribute>
+    <column>
+     <property name="text">
+      <string notr="true">1</string>
+     </property>
+    </column>
    </widget>
-   <widget class="QSplitter" name="splitter">
+   <widget class="QComboBox" name="comboBox">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>10</y>
+      <width>391</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>10</y>
+      <width>71</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Загрузить</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>621</width>
-      <height>31</height>
+      <width>151</width>
+      <height>21</height>
      </rect>
     </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <italic>true</italic>
+      <bold>true</bold>
+     </font>
     </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
+    <property name="text">
+     <string>http://codeforces.ru/api/</string>
     </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-    <property name="opaqueResize">
-     <bool>true</bool>
-    </property>
-    <widget class="QLineEdit" name="apiLineEdit">
-     <property name="placeholderText">
-      <string>http://codeforces.ru/api/</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="loadPushButton">
-     <property name="text">
-      <string>Загрузить</string>
-     </property>
-    </widget>
    </widget>
   </widget>
  </widget>

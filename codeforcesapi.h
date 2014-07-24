@@ -4,8 +4,9 @@
 #include <QObject>
 #include <QString>
 #include <QNetworkAccessManager>
-#include <QNetworkRequest>
 #include <QNetworkReply>
+
+#include <QJsonDocument>
 
 class CodeforcesAPI : public QObject
 {
@@ -14,20 +15,23 @@ class CodeforcesAPI : public QObject
 private:
     QString m_apiBase;
     QNetworkAccessManager m_networkManager;
-    QUrl m_currentUrl;
-    QNetworkRequest *m_currentRequest;
     QNetworkReply *m_currentReply;
-
-    void releaseRequestAndReply();
+    QJsonDocument m_resultJsonDocument;
 
 public slots:
-    void dataArrived();
+    void receivedJsonDocument();
+
+signals:
+    void readyJsonDocument();
 
 public:
     explicit CodeforcesAPI(QObject *parent = 0);
     ~CodeforcesAPI();
 
-    void loadData(QString apiMethod);
+    void retrieveJsonDocument(const QString &methodName);
+
+    const QJsonDocument &resultJsonDocument() const;
+    const QString &apiBase() const;
 };
 
 #endif // CODEFORCESAPI_H
