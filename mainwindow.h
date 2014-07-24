@@ -18,6 +18,9 @@ public:
     ~MainWindow();
 
 private slots:
+    void readyRead();
+
+    void on_pushButton_clicked();
 
 private:
     Ui::MainWindow *ui;
