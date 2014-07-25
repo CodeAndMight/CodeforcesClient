@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonArray>
+#include <QSet>
 
 #include <QTreeWidgetItem>
 
@@ -37,6 +38,90 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::fillTreeWidget(const QJsonValue &jsonValue, QTreeWidgetItem *parent)
+{
+    if (jsonValue.isObject()) {
+        QJsonObject jsonObject = jsonValue.toObject();
+        QStringList keys = jsonObject.keys();
+
+        foreach (const QString &key, keys) {
+            QJsonValue value = jsonObject.value(key);
+            if (value.isArray()) {
+                QTreeWidgetItem *item = this->createItemTreeWidget(parent, key);
+                this->fillTreeWidget(value, item);
+            } else {
+                QTreeWidgetItem *item = this->createItemTreeWidget(parent, key);
+                this->fillTreeWidget(value, item);
+            }
+        }
+
+    } else if (jsonValue.isArray()) {
+        QJsonArray jsonArray = jsonValue.toArray();
+
+        foreach (const QJsonValue &subJsonValue, jsonArray) {
+            if (subJsonValue.isObject()) {
+                QJsonObject obj = subJsonValue.toObject();
+                QTreeWidgetItem *node = this->createNodeTreeWidget(parent, obj.keys(), obj);
+                this->fillTreeWidget(subJsonValue, node);
+            } else {
+                this->fillTreeWidget(subJsonValue, parent);
+            }
+        }
+
+    } else if (jsonValue.isString()) {
+        parent->setText(1, jsonValue.toString());
+    } else if (jsonValue.isBool()) {
+        parent->setText(1, QString::number(jsonValue.toBool()));
+    } else if (jsonValue.isDouble()) {
+        parent->setText(1, QString::number(jsonValue.toInt()));
+    }
+}
+
+QTreeWidgetItem *MainWindow::createNodeTreeWidget(QTreeWidgetItem *parent, const QStringList &labels, const QJsonObject &jsonObject)
+{
+    QTreeWidgetItem *node = NULL;
+
+    if (parent) {
+        node = new QTreeWidgetItem(parent);
+    } else {
+        node = new QTreeWidgetItem;
+        ui->treeWidget->addTopLevelItem(node);
+    }
+
+    QSet<QString> title = QSet<QString>::fromList(labels);
+    QSet<QString> keyTitles = QSet<QString>::fromList(m_api.keyTitles());
+
+    title.intersect(keyTitles);
+
+    if (title.isEmpty()) {
+        node->setText(0, "*");
+    } else {
+        QString k = title.values().at(0);
+        if (jsonObject.value(k).isString()) {
+            node->setText(0, jsonObject.value(k).toString());
+        } else {
+            node->setText(0, QString::number(jsonObject.value(k).toInt()));
+        }
+    }
+
+    return node;
+}
+
+QTreeWidgetItem *MainWindow::createItemTreeWidget(QTreeWidgetItem *parent, const QString &label)
+{
+    QTreeWidgetItem *item = NULL;
+
+    if (parent) {
+        item = new QTreeWidgetItem(parent);
+    } else {
+        item = new QTreeWidgetItem;
+        ui->treeWidget->addTopLevelItem(item);
+    }
+
+    item->setText(0, label);
+    return item;
+}
+
 void MainWindow::readyRead()
 {
     const QJsonDocument &jsonDocumnet = m_api.resultJsonDocument();
@@ -44,54 +129,8 @@ void MainWindow::readyRead()
     ui->treeWidget->clear();
 
     QJsonObject result = jsonDocumnet.object();
-    QStringList keys = result.keys();
-    for (QStringList::Iterator key = keys.begin(); key != keys.end(); key++) {
-        QTreeWidgetItem *root = new QTreeWidgetItem;
 
-        root->setText(0, *key);
-        root->setText(1, " ");
-
-        QJsonValue value = result.take(*key);
-
-        if (value.isString()) {
-            QTreeWidgetItem *item = new QTreeWidgetItem(root);
-
-            item->setText(0, value.toString());
-        } else if (value.isArray()) {
-            QJsonArray array = value.toArray();
-
-            int index = 0;
-
-            for (QJsonArray::Iterator obj = array.begin(); obj != array.end(); obj++) {
-                QJsonObject data = (*obj).toObject();
-
-                QTreeWidgetItem *subitem = new QTreeWidgetItem(root);
-
-                subitem->setText(0, QString::number(++index));
-
-                QStringList labels = data.keys();
-
-                for (QStringList::Iterator label = labels.begin(); label != labels.end(); label++) {
-                    QTreeWidgetItem *item = new QTreeWidgetItem(subitem);
-
-                    item->setText(0, *label);
-
-                    QJsonValue jv = data.value(*label);
-
-                    if (jv.isString()) {
-                        item->setText(1, jv.toString());
-                    } else if (jv.isDouble()) {
-                        item->setText(1, QString::number(jv.toDouble()));
-                    } else if (jv.isBool()) {
-                        item->setText(1, QString::number(jv.toBool()));
-                    }
-                }
-            }
-
-        }
-
-        ui->treeWidget->addTopLevelItem(root);
-    }
+    this->fillTreeWidget(result);
 
     ui->treeWidget->setCursor(Qt::ArrowCursor);
     ui->pushButton->setCursor(Qt::ArrowCursor);

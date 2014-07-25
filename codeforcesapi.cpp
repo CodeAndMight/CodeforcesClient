@@ -6,6 +6,11 @@ CodeforcesAPI::CodeforcesAPI(QObject *parent) : QObject(parent)
 {
     m_apiBase = "http://codeforces.ru/api/";
     m_currentReply = NULL;
+
+    m_keyTitles.append("handle");
+    m_keyTitles.append("name");
+    m_keyTitles.append("points");
+    m_keyTitles.append("contestName");
 }
 
 CodeforcesAPI::~CodeforcesAPI()
@@ -47,4 +52,9 @@ const QString &CodeforcesAPI::apiBase() const
 const QJsonDocument &CodeforcesAPI::resultJsonDocument() const
 {
     return m_resultJsonDocument;
+}
+
+const QStringList &CodeforcesAPI::keyTitles() const
+{
+    return m_keyTitles;
 }

@@ -17,6 +17,7 @@ private:
     QNetworkAccessManager m_networkManager;
     QNetworkReply *m_currentReply;
     QJsonDocument m_resultJsonDocument;
+    QStringList m_keyTitles;
 
 public slots:
     void receivedJsonDocument();
@@ -32,6 +33,7 @@ public:
 
     const QJsonDocument &resultJsonDocument() const;
     const QString &apiBase() const;
+    const QStringList &keyTitles() const;
 };
 
 #endif // CODEFORCESAPI_H
